@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nayma - Entrar</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilos Gerais */
+        body { background-color: #000; color: white; font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .login-container { height: 100vh; display: flex; justify-content: center; align-items: center; }
+        
+        /* Botão Voltar ao Início - Bem Visível */
+        .btn-voltar-inicio {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            background: #e50914; /* Vermelho Nayma */
+            padding: 12px 20px;
+            border-radius: 5px;
+            border: 1px solid white;
+            transition: 0.3s;
+        }
+        .btn-voltar-inicio:hover { background: #b20710; transform: scale(1.05); }
+
+        /* Caixa de Login */
+        .login-box { background-color: rgba(0, 0, 0, 0.85); padding: 60px; border-radius: 10px; width: 100%; max-width: 450px; }
+        .logo-nayma { color: #e50914; font-size: 40px; font-weight: bold; text-align: center; margin-bottom: 30px; }
+        .input-group { margin-bottom: 16px; }
+        .input-group input { width: 100%; padding: 16px; border-radius: 4px; border: none; background-color: #333; color: white; font-size: 16px; box-sizing: border-box; }
+        .btn-entrar { width: 100%; padding: 16px; background-color: #e50914; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        
+        /* Painel Admin - Só aparece para o Andson */
+        #admin-panel { 
+            display: none; 
+            background: #1a1a1a; 
+            padding: 20px; 
+            border: 2px solid #e50914; 
+            color: white; 
+            margin-top: 20px; 
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+        th, td { border: 1px solid #333; padding: 12px; text-align: left; }
+        th { background-color: #e50914; color: white; }
+        tr:nth-child(even) { background-color: #222; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="btn-voltar-inicio">← Voltar ao Início</a>
+
+    <div class="login-container">
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center; padding: 20px;">
+            
+            <div id="box-login-principal" class="login-box">
+                <div class="logo-nayma">NAYMA</div>
+                <h2 style="color:white; margin-bottom:20px;">Entrar</h2>
+                <form id="form-login">
+                    <div class="input-group">
+                        <input type="email" id="l-email" placeholder="E-mail" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="l-senha" placeholder="Palavra-passe" required>
+                    </div>
+                    <button type="submit" class="btn-entrar">Entrar</button>
+                </form>
+                <p style="margin-top: 20px; color: #737373;">Novo aqui? <a href="cadastro.html" style="color: white; text-decoration: none; font-weight: bold;">Cadastre-se agora.</a></p>
+            </div>
+
+            <div id="admin-panel">
+                <h2 style="color: #e50914; text-align: center;">Painel de Controle Nayma</h2>
+                <p style="text-align: center; color: #aaa;">Bem-vindo, Andson. Aqui estão os dados dos usuários:</p>
+                <table id="tabela-usuarios">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Senha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+                <button onclick="window.location.href='index.html'" style="margin-top:20px; background:#444; color:white; border:none; padding:12px; cursor:pointer; border-radius:4px; width:100%; font-weight:bold;">Sair do Painel e ir para o Site</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('form-login').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const emailDigitado = document.getElementById('l-email').value;
+            const senhaDigitada = document.getElementById('l-senha').value;
+            
+            // --- DADOS DO ADMINISTRADOR (SÓ VOCÊ) ---
+            const admEmail = "andson7pontes08@gmail.com";
+            const admSenha = "211784andson";
+
+            // 1. Verificação de Administrador
+            if (emailDigitado === admEmail && senhaDigitada === admSenha) {
+                const usuarios = JSON.parse(localStorage.getItem('usuarios_nayma') || "[]");
+                const tbody = document.querySelector('#tabela-usuarios tbody');
+                tbody.innerHTML = "";
+                
+                // Preenche a tabela com todos os cadastrados
+                usuarios.forEach(u => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${u.nome}</td>
+                            <td>${u.email}</td>
+                            <td>${u.senha}</td>
+                        </tr>`;
+                });
+
+                // Mostra o Painel e esconde o Login
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('box-login-principal').style.display = 'none';
+                return;
+            }
+
+            // 2. Verificação de Usuário Comum
+            const usuariosCadastrados = JSON.parse(localStorage.getItem('usuarios_nayma') || "[]");
+            const usuarioExistente = usuariosCadastrados.find(u => u.email === emailDigitado && u.senha === senhaDigitada);
+
+            if (usuarioExistente) {
+                // Salva que o usuário está logado
+                localStorage.setItem('usuario_sessao', JSON.stringify(usuarioExistente));
+                window.location.href = 'index.html'; 
+            } else {
+                alert("Atenção: E-mail ou palavra-passe incorretos!");
+            }
+        });
+    </script>
+
+</body>
+</html>
