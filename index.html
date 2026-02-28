@@ -9,30 +9,54 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e50914">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <link rel="apple-touch-icon" href="https://drive.google.com/thumbnail?id=16jsNnyHYV_oFhgCeMCTSVfC6yfv5AYJf&sz=w192">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/192/n.png">
 
     <style>
-        /* Estilos para o Perfil e Botão Sair no Topo */
+        /* Tela de Carregamento (Splash Screen) */
+        #loading {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-text {
+            color: #e50914;
+            font-family: Arial, sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            letter-spacing: 8px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.3; transform: scale(0.95); }
+        }
+
+        /* Estilos do Perfil - CORRIGIDOS PARA NÃO SOBREPOR */
         .user-area {
-            position: absolute;
-            top: 20px;
-            right: 30px;
             display: flex;
             align-items: center;
             gap: 12px;
-            z-index: 1000;
         }
 
         .avatar {
             width: 40px;
             height: 40px;
-            background-color: #e50914; /* Vermelho Nayma */
+            background-color: #e50914;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%; /* Foto Redonda */
+            border-radius: 50%;
             font-weight: bold;
             font-size: 18px;
             text-transform: uppercase;
@@ -52,26 +76,39 @@
             transition: 0.3s;
         }
 
-        .btn-sair:hover {
-            background: white;
-            color: #e50914;
-        }
-
         #nav-login { display: block; } 
         #nav-perfil { display: none; }
+        
+        /* Ajuste do Login para mobile */
+        .login-btn-link {
+            color: white; 
+            text-decoration: none; 
+            font-weight: bold; 
+            background: #e50914; 
+            padding: 8px 20px; 
+            border-radius: 4px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
+
+    <div id="loading">
+        <div class="loading-text">NAYMA</div>
+    </div>
+
     <header>
         <div class="logo">NAYMA</div>
         
-        <div id="nav-login" style="position: absolute; top: 25px; right: 30px;">
-            <a href="login.html" style="color: white; text-decoration: none; font-weight: bold; background: #e50914; padding: 8px 20px; border-radius: 4px;">Login</a>
-        </div>
+        <div class="header-right">
+            <div id="nav-login">
+                <a href="login.html" class="login-btn-link">Login</a>
+            </div>
 
-        <div id="nav-perfil" class="user-area">
-            <div class="avatar" id="user-initial"></div>
-            <button class="btn-sair" onclick="confirmarSaida()">Sair</button>
+            <div id="nav-perfil" class="user-area">
+                <div class="avatar" id="user-initial"></div>
+                <button class="btn-sair" onclick="confirmarSaida()">Sair</button>
+            </div>
         </div>
 
         <nav>
@@ -89,7 +126,7 @@
         <div class="vitrine">
             <div class="card">
                 <a href="filmes.html">
-                    <img src="https://drive.google.com/thumbnail?id=16jsNnyHYV_oFhgCeMCTSVfC6yfv5AYJf&sz=w1000" alt="Catálogo de Filmes">
+                    <img src="https://drive.google.com/thumbnail?id=16jsNnyHYV_oFhgCeMCTSVfC6yfv5AYJf&sz=w1000" alt="Filmes">
                 </a>
             </div>
         </div>
@@ -98,11 +135,11 @@
         <div class="vitrine">
             <div class="card">
                 <a href="animes.html">
-                    <img src="https://drive.google.com/thumbnail?id=1Sj8QjhCZ1kD25QK_JsRRSqc7jY6lk9I1&sz=w1000" alt="One Piece">
+                    <img src="https://drive.google.com/thumbnail?id=1Sj8QjhCZ1kD25QK_JsRRSqc7jY6lk9I1&sz=w1000" alt="Animes">
                 </a>
             </div>
         </div>
-
+        
         <h2>Todas as Séries do site Nayma</h2>
         <div class="vitrine">
             <div class="card">
@@ -114,34 +151,32 @@
     </main>
 
     <script>
-        // ATIVAÇÃO DO APLICATIVO
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loading');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }, 1000);
+        });
+
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-            .then(() => console.log("App Nayma pronto!"));
+            navigator.serviceWorker.register('sw.js');
         }
 
         function verificarSessao() {
             const usuario = JSON.parse(localStorage.getItem('usuario_sessao'));
-
             if (usuario) {
                 document.getElementById('nav-login').style.display = 'none';
                 document.getElementById('nav-perfil').style.display = 'flex';
-                
-                const inicial = usuario.nome.charAt(0);
-                document.getElementById('user-initial').innerText = inicial;
+                document.getElementById('user-initial').innerText = usuario.nome.charAt(0);
             }
         }
 
         function confirmarSaida() {
-            const resposta = confirm("Você realmente deseja sair?");
-            if (resposta) {
-                fazerLogout();
+            if (confirm("Você realmente deseja sair?")) {
+                localStorage.removeItem('usuario_sessao');
+                window.location.reload(); 
             }
-        }
-
-        function fazerLogout() {
-            localStorage.removeItem('usuario_sessao');
-            window.location.reload(); 
         }
 
         window.onload = verificarSessao;

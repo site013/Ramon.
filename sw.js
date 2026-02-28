@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nayma-v1';
+const CACHE_NAME = 'nayma-v2';
 const assets = [
   './',
   './index.html',
